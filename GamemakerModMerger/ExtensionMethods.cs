@@ -16,11 +16,9 @@ namespace GamemakerModMerger
         #region AddObjects
         public static void AddSprite(this UndertaleData data, UndertaleSprite sprite)
         {
-            UndertaleSprite newsprite = new();
-            newsprite.Name = data.Strings.MakeString(sprite.Name.Content);
+            UndertaleSprite newsprite = new() { Name = data.Strings.MakeString(sprite.Name.Content) };
             data.Sprites.Add(newsprite);
             data.ReplaceSprite(sprite);
-            Console.WriteLine(sprite.Name.Content);
         }
 
         public static void ReplaceSprite(this UndertaleData data, UndertaleSprite sprite)
@@ -79,7 +77,8 @@ namespace GamemakerModMerger
         public static bool Match(this UndertaleSprite spriteA, UndertaleSprite spriteB)
         {
             //handle null cases
-            if (spriteA == null || spriteB == null) throw new ArgumentNullException("One of the sprites is null.");
+            ArgumentNullException.ThrowIfNull(spriteA);
+            ArgumentNullException.ThrowIfNull(spriteB);
 
             if (spriteA.Textures.Count != spriteB.Textures.Count) return false;
             for (int i = 0; i < spriteA.Textures.Count; i++)

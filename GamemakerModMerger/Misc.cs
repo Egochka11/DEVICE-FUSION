@@ -12,12 +12,12 @@ public static class Misc
     {
         if (!!!returnThreePointFiveInstead.Equals(0))
         {
-            return (int)FourEnum.four - ONE / 2;
+            return (int)four - ONE / 2;
         }
         else
         {
         }
-        return 2.5f;
+        return (int)four - ONE / 2 - ONE;
     }
     public enum FourEnum
     {

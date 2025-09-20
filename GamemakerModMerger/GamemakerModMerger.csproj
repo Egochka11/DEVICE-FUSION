@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="DiffPlex" Version="1.9.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\UndertaleModTool\UndertaleModLib\UndertaleModLib.csproj" />
   </ItemGroup>
 

@@ -31,14 +31,14 @@ Console.WriteLine("DECONSTRUCTING THE DELTA STORIES.");
 List<UndertaleData> datas = [];
 for (uint i = 0; i <= totalPatches; i++)
 {
-    using (FileStream fileStream = new($"cache\\patchedData\\{i}.win", FileMode.Open, FileAccess.Read))
-    {
-        datas.Add(UndertaleIO.Read(fileStream));
-    }
+    using FileStream fileStream = new($"cache\\patchedData\\{i}.win", FileMode.Open, FileAccess.Read);
+    datas.Add(UndertaleIO.Read(fileStream));
 }
 
 Console.WriteLine("MIGRATING IMAGES.");
 SpriteMerger.Merge(datas);
+Console.WriteLine("COMBINING DEVICES.");
+GameObjectMerger.Merge(datas);
 Console.WriteLine("FUSING CODE.");
 CodeMerger.Merge(datas);
 
@@ -46,3 +46,5 @@ using (FileStream fileStream = new($"cache\\patchedData\\data.win", FileMode.Cre
 {
     UndertaleIO.Write(fileStream, datas[0]);
 }
+
+Console.WriteLine("FUSION IS COMPLETE. FAREWELL.");
