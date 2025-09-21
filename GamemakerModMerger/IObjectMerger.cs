@@ -80,7 +80,21 @@ public class CodeMerger : IObjectMerger<UndertaleCode>
 
                 if (check && !changedCode.Contains(code.Name.Content))
                     changedCode.Add(code.Name.Content);
-                //importGroup.QueueReplace(code.Name.Content, new DecompileContext(context, code, data.ToolInfo.DecompilerSettings).DecompileToString());
+
+
+                if (datas[0].Code.ByName(code.Name.Content) == null && code.Name.Content.Contains("_Collision_"))
+                {
+                    string codeEntryName = code.Name.Content;
+                    int lastUnderscore = codeEntryName.LastIndexOf('_');
+                    int secondLastUnderscore = codeEntryName.LastIndexOf('_', lastUnderscore - 1);
+
+                    ReadOnlySpan<char> objectName = codeEntryName.AsSpan(new Range("gml_Object_".Length, secondLastUnderscore));
+
+                    UndertaleCode newCode = new() { Name = datas[0].Strings.MakeString(codeEntryName) };
+                    datas[0].Code.Add(newCode);
+
+                    CodeImportGroup.LinkEvent(datas[0].GameObjects.ByName(objectName), newCode, EventType.Collision, (uint)datas[0].GameObjects.IndexOfName(data.GameObjects[int.Parse(codeEntryName.AsSpan(lastUnderscore + 1))].Name.Content));
+                }
 
                 if (data.Code.IndexOf(code) % 100 == 0)
                     Console.WriteLine($"{data.Code.IndexOf(code)}/{data.Code.Count} CODE ENTRIES ITERATED IN DELTA {datas.IndexOf(data)}.");
@@ -93,8 +107,6 @@ public class CodeMerger : IObjectMerger<UndertaleCode>
         CodeImportGroup importGroup = new(datas[0]);
         foreach (string codeName in changedCode)
         {
-            if (codeName == "scr_green_draw" || codeName == "gml_GlobalScript_scr_green_draw")
-                Console.WriteLine("green deawn");
             var origCodeObj = datas[0].Code.ByName(codeName);
             string origCode = origCodeObj == null ? "\n" : new DecompileContext(context[0], origCodeObj, datas[0].ToolInfo.DecompilerSettings).DecompileToString();
             string mergedCode = origCode;
@@ -103,7 +115,7 @@ public class CodeMerger : IObjectMerger<UndertaleCode>
             {
                 var thisCodeObj = datas[data].Code.ByName(codeName);
                 string thisCode = thisCodeObj == null ? "\n" : new DecompileContext(context[data], thisCodeObj, datas[data].ToolInfo.DecompilerSettings).DecompileToString();
-                var diff = ThreeWayDiffer.Instance.CreateDiffs(origCode, mergedCode, thisCode, true, false, LineChunkerThatPreservesNewlines.Instance);
+                var diff = ThreeWayDiffer.Instance.CreateDiffs(origCode, mergedCode, thisCode, true, false, LineEndingsPreservingChunker.Instance);
 
                 mergedCode = "";
                 int baseIndex = 0;
@@ -160,11 +172,10 @@ public class CodeMerger : IObjectMerger<UndertaleCode>
                     newIndex++;
                 }
             }
-
             importGroup.QueueReplace(codeName, mergedCode);
         }
 
-
+        Console.WriteLine("BEGINNING CODE IMPORT.");
         importGroup.Import();
         return datas[0].Code as UndertalePointerList<UndertaleCode>;
     }
@@ -200,7 +211,6 @@ public class GameObjectMerger : IObjectMerger<UndertaleGameObject>
                 origObject.Solid = gameObject.Solid;
                 origObject.Depth = gameObject.Depth;
                 origObject.Persistent = gameObject.Persistent;
-                //origObject.ParentId = gameObject.ParentId; //TODO: implement good parenting
                 if (gameObject.TextureMaskId is not null)
                     origObject.TextureMaskId = datas[0].Sprites.ByName(gameObject.TextureMaskId.Name.Content);
 

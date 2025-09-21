@@ -73,7 +73,7 @@ namespace GamemakerModMerger
 
         #region Equals
 
-        private static readonly TextureWorker Worker = new();
+        private static readonly TextureWorker TexWorker = new();
         public static bool Match(this UndertaleSprite spriteA, UndertaleSprite spriteB)
         {
             //handle null cases
@@ -86,11 +86,13 @@ namespace GamemakerModMerger
                 if (spriteA.Textures[i].Texture == null && spriteB.Textures[i].Texture == null) continue;
                 if (spriteA.Textures[i].Texture == null || spriteB.Textures[i].Texture == null) return false;
 
-                var imgA = Worker.GetTextureFor(spriteA.Textures[i].Texture, $"Texture {i} of spriteA ({spriteA.Name.Content}) in ExtensionMethods.Equals(this UndertaleSprite, UndertaleSprite)", true) as MagickImage;
-                var imgB = Worker.GetTextureFor(spriteB.Textures[i].Texture, $"Texture {i} of spriteB ({spriteB.Name.Content}) in ExtensionMethods.Equals(this UndertaleSprite, UndertaleSprite)", true) as MagickImage;
-                imgB.Format = imgA.Format;
-                if (imgA.Compare(imgB, ErrorMetric.Absolute) != 0)
+                var imgA = TexWorker.GetTextureFor(spriteA.Textures[i].Texture, $"Texture {i} of spriteA ({spriteA.Name.Content})", true) as MagickImage;
+                var imgB = TexWorker.GetTextureFor(spriteB.Textures[i].Texture, $"Texture {i} of spriteB ({spriteB.Name.Content})", true) as MagickImage;
+                imgA.Format = MagickFormat.Bmp; // any format that can be converted to byte array seems pretty much equal in performace
+                imgB.Format = MagickFormat.Bmp;
+                if (!imgA.ToByteArray().SequenceEqual(imgB.ToByteArray())) // lazy i know
                 {
+                    Console.WriteLine("no");
                     return false;
                 }
             } // Just check for the textures, the rest probably doesnt matter ¯\_(ツ)_/¯

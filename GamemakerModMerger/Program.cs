@@ -2,7 +2,10 @@
 
 using GamemakerModMerger;
 using System.Reflection;
+using Underanalyzer.Decompiler;
 using UndertaleModLib;
+using UndertaleModLib.Compiler;
+using UndertaleModLib.Decompiler;
 Console.ForegroundColor = ConsoleColor.Green;
 
 
@@ -29,10 +32,22 @@ await XdeltaPatching.PatchXDelta(datapath, patches, programLocation + "\\cache\\
 
 Console.WriteLine("DECONSTRUCTING THE DELTA STORIES.");
 List<UndertaleData> datas = [];
-for (uint i = 0; i <= totalPatches; i++)
+for (int i = 0; i <= totalPatches; i++)
 {
     using FileStream fileStream = new($"cache\\patchedData\\{i}.win", FileMode.Open, FileAccess.Read);
     datas.Add(UndertaleIO.Read(fileStream));
+    datas[i].ToolInfo.DecompilerSettings = new DecompileSettings() //decompile settings for more consistent diffs
+    {
+        PrintWarnings = false,
+        RemoveSingleLineBlockBraces = true,
+
+        EmptyLineAfterBlockLocals = false,
+        EmptyLineAfterSwitchCases = false,
+        EmptyLineAroundBranchStatements = false,
+        EmptyLineAroundEnums = false,
+        EmptyLineAroundFunctionDeclarations = false,
+        EmptyLineAroundStaticInitialization = false,
+    };
 }
 
 Console.WriteLine("MIGRATING IMAGES.");
