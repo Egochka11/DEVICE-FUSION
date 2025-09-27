@@ -52,6 +52,8 @@ for (int i = 0; i <= totalPatches; i++)
 
 Console.WriteLine("MIGRATING IMAGES.");
 SpriteMerger.Merge(datas);
+Console.WriteLine("UNIFYING SHADERS.");
+ShaderMerger.Merge(datas);
 Console.WriteLine("COMBINING DEVICES.");
 GameObjectMerger.Merge(datas);
 Console.WriteLine("FUSING CODE.");

@@ -5,13 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace GamemakerModMerger;
-public static class GasterLogger
+public static class Gaster
 {
-    public static void Log(string message)
+    public static void WriteLine(string message)
     {
         Console.WriteLine(message);
     }
-    public static void Log(string message, string gasterAlt)
+    public static void WriteLine(string message, string gasterAlt)
     {
         Console.WriteLine(message);
         Console.WriteLine(gasterAlt);

@@ -92,9 +92,12 @@ namespace GamemakerModMerger
                 imgB.Format = MagickFormat.Bmp;
                 if (!imgA.ToByteArray().SequenceEqual(imgB.ToByteArray())) // lazy i know
                 {
-                    Console.WriteLine("no");
+                    imgA.Dispose();
+                    imgB.Dispose();
                     return false;
                 }
+                imgA.Dispose();
+                imgB.Dispose();
             } // Just check for the textures, the rest probably doesnt matter ¯\_(ツ)_/¯
 
             return true;

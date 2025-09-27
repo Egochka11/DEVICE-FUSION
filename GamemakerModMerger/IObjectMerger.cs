@@ -250,3 +250,58 @@ public class GameObjectMerger : IObjectMerger<UndertaleGameObject>
 
 }
 
+public class ShaderMerger : IObjectMerger<UndertaleShader>
+{
+    public static UndertalePointerList<UndertaleShader> Merge(List<UndertaleData> datas)
+    {
+        foreach (UndertaleData data in datas)
+        {
+            if (datas.IndexOf(data) == 0) continue; // skip vanilla
+            foreach (var donorShader in data.Shaders)
+            {
+                var targetShader = datas[0].Shaders.ByName(donorShader.Name.Content);
+                if (targetShader == null)
+                {
+                    targetShader = new UndertaleShader();
+                    datas[0].Shaders.Add(targetShader);
+                    targetShader.Name = datas[0].Strings.MakeString(donorShader.Name.Content);
+                }
+                targetShader.Type = donorShader.Type;
+
+                targetShader.GLSL_ES_Vertex = datas[0].Strings.MakeString(donorShader.GLSL_ES_Vertex.Content);
+                targetShader.GLSL_ES_Fragment = datas[0].Strings.MakeString(donorShader.GLSL_ES_Fragment.Content);
+                targetShader.GLSL_Vertex = datas[0].Strings.MakeString(donorShader.GLSL_Vertex.Content);
+                targetShader.GLSL_Fragment = datas[0].Strings.MakeString(donorShader.GLSL_Fragment.Content);
+                targetShader.HLSL9_Vertex = datas[0].Strings.MakeString(donorShader.HLSL9_Vertex.Content);
+                targetShader.HLSL9_Fragment = datas[0].Strings.MakeString(donorShader.HLSL9_Fragment.Content);
+
+                targetShader.Version = donorShader.Version;
+
+                targetShader.HLSL11_VertexData = donorShader.HLSL11_VertexData;
+                targetShader.HLSL11_PixelData = donorShader.HLSL11_PixelData;
+                /* no play station
+                origShader.PSSL_VertexData = shader.PSSL_VertexData;
+                origShader.PSSL_PixelData = shader.PSSL_PixelData;
+                origShader.Cg_PSVita_VertexData = shader.Cg_PSVita_VertexData;
+                origShader.Cg_PSVita_PixelData = shader.Cg_PSVita_PixelData;
+                origShader.Cg_PS3_VertexData = shader.Cg_PS3_VertexData;
+                origShader.Cg_PS3_PixelData = shader.Cg_PS3_PixelData;
+                */
+                foreach (var attribute in donorShader.VertexShaderAttributes)
+                {
+                    targetShader.VertexShaderAttributes.Add(new UndertaleShader.VertexShaderAttribute() { Name = datas[0].Strings.MakeString(donorShader.Name.Content)});
+                }
+
+                //VertexShaderAttribute and yeah
+
+                if (data.Shaders.IndexOf(donorShader) % 100 == 0)
+                    Console.WriteLine($"{data.Shaders.IndexOf(donorShader)}/{data.Shaders.Count} SHADERS HANDLED IN DELTA {datas.IndexOf(data)}.");
+            }
+            Console.WriteLine($"ALL SHADERS HANDLED IN DELTA {datas.IndexOf(data)}.");
+        }
+        return datas[0].Shaders as UndertalePointerList<UndertaleShader>;
+    }
+
+
+}
+
