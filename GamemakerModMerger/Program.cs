@@ -6,31 +6,36 @@ using Underanalyzer.Decompiler;
 using UndertaleModLib;
 using UndertaleModLib.Compiler;
 using UndertaleModLib.Decompiler;
-Console.ForegroundColor = ConsoleColor.Green;
+
+Gaster.WriteLine("Before beginning, would you like to enable Gaster mode? (y/n)");
+Gaster.GasterAlt = Console.ReadLine() == "y";
+if (Gaster.GasterAlt) Console.ForegroundColor = ConsoleColor.Green;
 
 
 string programLocation = Directory.GetParent(Assembly.GetExecutingAssembly().Location).ToString();
 //Console.WriteLine(programLocation);
 
-Console.WriteLine("THE STORY IN PUREST FORM.");
-var datapath = Console.In.ReadLine();
-Console.WriteLine("THE AMOUNT OF ALTERATIONS.");
-var totalPatches = uint.Parse(Console.In.ReadLine());
+Gaster.WriteLine("The original data.win file:", "THE STORY IN PUREST FORM.");
+var datapath = Console.ReadLine();
+Gaster.WriteLine("The folder the merged data should be placed in:", "THE DESTINATION OF FUSION.");
+var savepath = Console.ReadLine();
+Gaster.WriteLine("Patch amount:", "THE AMOUNT OF ALTERATIONS.");
+var totalPatches = uint.Parse(Console.ReadLine());
 
 var patches = new List<string>();
 for (uint i = 0; i < totalPatches; i++)
 {
-    Console.WriteLine($"DELTA {i+1}.");
+    Gaster.WriteLine($"Patch {i + 1}:", $"DELTA {i+1}.");
     patches.Add(Console.ReadLine());
 }
 
 Directory.CreateDirectory("cache\\patchedData");
 
 File.Copy(datapath, "cache\\patchedData\\0.win", true);
-Console.WriteLine("APPLYING THE DELTAS SEPARATELY.");
+Gaster.WriteLine("Patching mods into separate files...", "APPLYING THE DELTAS SEPARATELY.");
 await XdeltaPatching.PatchXDelta(datapath, patches, programLocation + "\\cache\\patchedData");
 
-Console.WriteLine("DECONSTRUCTING THE DELTA STORIES.");
+Gaster.WriteLine("Loading the data files into memory...", "DECONSTRUCTING THE DELTA STORIES.");
 List<UndertaleData> datas = [];
 for (int i = 0; i <= totalPatches; i++)
 {
@@ -50,18 +55,24 @@ for (int i = 0; i <= totalPatches; i++)
     };
 }
 
-Console.WriteLine("MIGRATING IMAGES.");
+Gaster.WriteLine("Merging Sprites...", "MIGRATING IMAGES.");
 SpriteMerger.Merge(datas);
-Console.WriteLine("UNIFYING SHADERS.");
+Gaster.WriteLine("Merging Shaders...", "UNIFYING SHADERS.");
 ShaderMerger.Merge(datas);
-Console.WriteLine("COMBINING DEVICES.");
+Gaster.WriteLine("Merging Objects...", "COMBINING DEVICES.");
 GameObjectMerger.Merge(datas);
-Console.WriteLine("FUSING CODE.");
+Gaster.WriteLine("Merging Code...", "FUSING CODE.");
 CodeMerger.Merge(datas);
 
-using (FileStream fileStream = new($"cache\\patchedData\\data.win", FileMode.Create, FileAccess.Write))
+Gaster.WriteLine("Saving merged data.win...", "CREATING THE FILE OF FUSION.");
+using (FileStream fileStream = new("cache\\patchedData\\data.win", FileMode.Create, FileAccess.Write))
 {
     UndertaleIO.Write(fileStream, datas[0]);
 }
 
-Console.WriteLine("FUSION IS COMPLETE. FAREWELL.");
+using (FileStream fileStream = new($"{savepath}\\data.win", FileMode.Create, FileAccess.Write))
+{
+    UndertaleIO.Write(fileStream, datas[0]);
+}
+
+Gaster.WriteLine("Mod merging completed successfully.", "FUSION IS COMPLETE. FAREWELL.");

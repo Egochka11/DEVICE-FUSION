@@ -45,9 +45,10 @@ public class SpriteMerger : IObjectMerger<UndertaleSprite>
                     spriteChanged[datas[0].IndexOf(origSprite)] = true;
                 }
                 if (data.Sprites.IndexOf(sprite) % 100 == 0)
-                    Console.WriteLine($"{data.Sprites.IndexOf(sprite)}/{data.Sprites.Count} IMAGES HANDLED IN DELTA {datas.IndexOf(data)}.");
+                    Gaster.WriteLine($"{data.Sprites.IndexOf(sprite)}/{data.Sprites.Count} Sprites of mod {datas.IndexOf(data)} iterated.", 
+                        $"{data.Sprites.IndexOf(sprite)}/{data.Sprites.Count} IMAGES HANDLED IN DELTA {datas.IndexOf(data)}.");
             }
-            Console.WriteLine($"ALL IMAGES HANDLED IN DELTA {datas.IndexOf(data)}.");
+            Gaster.WriteLine($"Sprite merging complete for mod {datas.IndexOf(data)}.", $"ALL IMAGES HANDLED IN DELTA {datas.IndexOf(data)}.");
         }
         return datas[0].Sprites as UndertalePointerList<UndertaleSprite>;
     }
@@ -97,12 +98,13 @@ public class CodeMerger : IObjectMerger<UndertaleCode>
                 }
 
                 if (data.Code.IndexOf(code) % 100 == 0)
-                    Console.WriteLine($"{data.Code.IndexOf(code)}/{data.Code.Count} CODE ENTRIES ITERATED IN DELTA {datas.IndexOf(data)}.");
+                    Gaster.WriteLine($"{data.Code.IndexOf(code)}/{data.Code.Count} Code entries of mod {datas.IndexOf(data)} iterated.",
+                        $"{data.Code.IndexOf(code)}/{data.Code.Count} CODE ENTRIES ITERATED IN DELTA {datas.IndexOf(data)}.");
             }
-            Console.WriteLine($"ALL CODE ENTRIES ITERATED IN DELTA {datas.IndexOf(data)}.");
+            Gaster.WriteLine($"All code entries iterated for mod {datas.IndexOf(data)}.", $"ALL CODE ENTRIES ITERATED IN DELTA {datas.IndexOf(data)}.");
         }
 
-        Console.WriteLine($"BEGINNING FUSION OF CODE TEXT.");
+        Gaster.WriteLine("Beginning code merging...", "BEGINNING FUSION OF CODE TEXT.");
 
         CodeImportGroup importGroup = new(datas[0]);
         foreach (string codeName in changedCode)
@@ -151,7 +153,8 @@ public class CodeMerger : IObjectMerger<UndertaleCode>
                                 mergedCode = string.Concat(mergedCode, diff.PiecesOld[oldIndex + i]);
                             break;
                         case ThreeWayChangeType.Conflict:
-                            Console.WriteLine($"CONFLICT ENCOUNTERED DURING FUSION OF \"{codeName}\". FUSION MAY NOT WORK CORRECTLY.");
+                            Gaster.WriteLine($"There was a conflict while fusing \"{codeName}\". This may lead to unexpected behavior.", 
+                                $"CONFLICT ENCOUNTERED DURING FUSION OF \"{codeName}\". FUSION MAY NOT WORK CORRECTLY.");
                             for (var i = 0; i < block.OldCount; i++) // do both i guess
                                 mergedCode = string.Concat(mergedCode, diff.PiecesOld[oldIndex + i]);
                             for (var i = 0; i < block.NewCount; i++)
@@ -175,7 +178,7 @@ public class CodeMerger : IObjectMerger<UndertaleCode>
             importGroup.QueueReplace(codeName, mergedCode);
         }
 
-        Console.WriteLine("BEGINNING CODE IMPORT.");
+        Gaster.WriteLine("Beginning Code import...", "BEGINNING CODE IMPORT.");
         importGroup.Import();
         return datas[0].Code as UndertalePointerList<UndertaleCode>;
     }
@@ -230,9 +233,10 @@ public class GameObjectMerger : IObjectMerger<UndertaleGameObject>
                 //Events should be handled by the code merger
 
                 if (data.GameObjects.IndexOf(gameObject) % 100 == 0)
-                    Console.WriteLine($"{data.GameObjects.IndexOf(gameObject)}/{data.GameObjects.Count} DEVICES HANDLED IN DELTA {datas.IndexOf(data)}.");
+                    Gaster.WriteLine($"{data.GameObjects.IndexOf(gameObject)}/{data.GameObjects.Count} Objects of mod {datas.IndexOf(data)} iterated.",
+                        $"{data.GameObjects.IndexOf(gameObject)}/{data.GameObjects.Count} DEVICES HANDLED IN DELTA {datas.IndexOf(data)}.");
             }
-            Console.WriteLine($"ALL DEVICES HANDLED IN DELTA {datas.IndexOf(data)}.");
+            Gaster.WriteLine($"Object merging complete for mod {datas.IndexOf(data)}.", $"ALL DEVICES HANDLED IN DELTA {datas.IndexOf(data)}.");
         }
         foreach (UndertaleData data in datas)
         {
@@ -295,9 +299,10 @@ public class ShaderMerger : IObjectMerger<UndertaleShader>
                 //VertexShaderAttribute and yeah
 
                 if (data.Shaders.IndexOf(donorShader) % 100 == 0)
-                    Console.WriteLine($"{data.Shaders.IndexOf(donorShader)}/{data.Shaders.Count} SHADERS HANDLED IN DELTA {datas.IndexOf(data)}.");
+                    Gaster.WriteLine($"{data.Shaders.IndexOf(donorShader)}/{data.Shaders.Count} Shaders of mod {datas.IndexOf(data)} iterated.", 
+                        $"{data.Shaders.IndexOf(donorShader)}/{data.Shaders.Count} SHADERS HANDLED IN DELTA {datas.IndexOf(data)}.");
             }
-            Console.WriteLine($"ALL SHADERS HANDLED IN DELTA {datas.IndexOf(data)}.");
+            Gaster.WriteLine($"Shader merging complete for mod {datas.IndexOf(data)}.", $"ALL SHADERS HANDLED IN DELTA {datas.IndexOf(data)}.");
         }
         return datas[0].Shaders as UndertalePointerList<UndertaleShader>;
     }
