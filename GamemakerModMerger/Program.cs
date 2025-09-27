@@ -4,10 +4,8 @@ using GamemakerModMerger;
 using System.Reflection;
 using Underanalyzer.Decompiler;
 using UndertaleModLib;
-using UndertaleModLib.Compiler;
-using UndertaleModLib.Decompiler;
 
-Gaster.WriteLine("Before beginning, would you like to enable Gaster mode? (y/n)");
+Gaster.WriteLine("Before beginning, would you like to enable Gaster mode? (y/n) WARNING: Gaster mode is kind of cryptic so it is recommended to use only if you're familiar with the program");
 Gaster.GasterAlt = Console.ReadLine() == "y";
 if (Gaster.GasterAlt) Console.ForegroundColor = ConsoleColor.Green;
 
@@ -17,7 +15,7 @@ string programLocation = Directory.GetParent(Assembly.GetExecutingAssembly().Loc
 
 Gaster.WriteLine("The original data.win file:", "THE STORY IN PUREST FORM.");
 var datapath = Console.ReadLine();
-Gaster.WriteLine("The folder the merged data should be placed in:", "THE DESTINATION OF FUSION.");
+Gaster.WriteLine("The folder the merged data should be placed in (No backslash at the end):", "THE DESTINATION OF FUSION.");
 var savepath = Console.ReadLine();
 Gaster.WriteLine("Patch amount:", "THE AMOUNT OF ALTERATIONS.");
 var totalPatches = uint.Parse(Console.ReadLine());
