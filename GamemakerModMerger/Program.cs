@@ -15,7 +15,7 @@ string programLocation = Directory.GetParent(Assembly.GetExecutingAssembly().Loc
 
 Gaster.WriteLine("The original data.win file:", "THE STORY IN PUREST FORM.");
 var datapath = Console.ReadLine();
-Gaster.WriteLine("The folder the merged data should be placed in (No backslash at the end):", "THE DESTINATION OF FUSION.");
+Gaster.WriteLine("Where the file should be placed INCLUDING THE FILE NAME AND EXTENSION:", "THE DESTINATION OF FUSION.");
 var savepath = Console.ReadLine();
 Gaster.WriteLine("Patch amount:", "THE AMOUNT OF ALTERATIONS.");
 var totalPatches = uint.Parse(Console.ReadLine());
@@ -62,13 +62,16 @@ GameObjectMerger.Merge(datas);
 Gaster.WriteLine("Merging Code...", "FUSING CODE.");
 CodeMerger.Merge(datas);
 
+//for (int i = 1; i <= totalPatches; i++)
+ //   datas[i].Dispose();
+
 Gaster.WriteLine("Saving merged data.win...", "CREATING THE FILE OF FUSION.");
 using (FileStream fileStream = new("cache\\patchedData\\data.win", FileMode.Create, FileAccess.Write))
 {
     UndertaleIO.Write(fileStream, datas[0]);
 }
 
-using (FileStream fileStream = new($"{savepath}\\data.win", FileMode.Create, FileAccess.Write))
+using (FileStream fileStream = new(savepath, FileMode.Create, FileAccess.Write))
 {
     UndertaleIO.Write(fileStream, datas[0]);
 }
