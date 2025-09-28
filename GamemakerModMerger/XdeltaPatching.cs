@@ -14,7 +14,8 @@ internal static class XdeltaPatching
         {
             if (OperatingSystem.IsWindows())
             {
-                process.StartInfo.FileName = "xdelta3-3.1.0-x86_64.exe";
+                //process.StartInfo.FileName = "xdelta3-3.1.0-x86_64.exe";
+                process.StartInfo.FileName = "xdelta3-3.1.0-i686.exe";
                 process.StartInfo.Arguments = $"-d -f -s \"{data}\" \"{patch}\" \"{output}\"";
             }
             process.StartInfo.CreateNoWindow = false;

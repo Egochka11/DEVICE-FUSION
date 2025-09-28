@@ -15,4 +15,9 @@
     <ProjectReference Include="..\UndertaleModTool\UndertaleModLib\UndertaleModLib.csproj" />
   </ItemGroup>
 
+	<ItemGroup>
+		<None Update="xdelta3-3.1.0-i686.exe" CopyToOutputDirectory="PreserveNewest" />
+		<None Update="xdelta3-3.1.0-x86_64.exe" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
+
 </Project>
