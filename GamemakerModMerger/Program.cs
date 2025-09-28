@@ -5,6 +5,8 @@ using System.Reflection;
 using Underanalyzer.Decompiler;
 using UndertaleModLib;
 
+try {
+
 Gaster.WriteLine("Before beginning, would you like to enable Gaster mode? (y/n) WARNING: Gaster mode is kind of cryptic so it is recommended to use only if you're familiar with the program");
 Gaster.GasterAlt = Console.ReadLine() == "y";
 if (Gaster.GasterAlt) Console.ForegroundColor = ConsoleColor.Green;
@@ -77,3 +79,10 @@ using (FileStream fileStream = new(savepath, FileMode.Create, FileAccess.Write))
 }
 
 Gaster.WriteLine("Mod merging completed successfully.", "FUSION IS COMPLETE. FAREWELL.");
+
+}
+catch (Exception ex)
+{
+    Gaster.WriteLine($"An error occurred. The error information was saved in {Path.GetFullPath("cache\\crashLog.txt")}", $"ERROR OCCURED. IT MAY BE REVIEWED IN {Path.GetFullPath("cache\\crashLog.txt")}.");
+    File.WriteAllText("cache\\crashLog.txt", ex.ToString());
+}
