@@ -1,5 +1,5 @@
 # DEVICE_FUSION
-A CLI application that merges mods for GameMaker games that are distributed as .xdelta files.
+A console application that merges mods for GameMaker games that are distributed as .xdelta files.
 
 ## Usage
 First, choose Gaster or non-Gaster mode.
