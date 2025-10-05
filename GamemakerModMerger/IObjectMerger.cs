@@ -182,14 +182,6 @@ public class CodeMerger : IObjectMerger<UndertaleCode>
         importGroup.Import();
         return datas[0].Code as UndertalePointerList<UndertaleCode>;
     }
-    public class LineChunkerThatPreservesNewlines : DelimiterChunker
-    {
-        private readonly static char[] lineSeparators = ['\r', '\n'];
-
-        public LineChunkerThatPreservesNewlines() : base(lineSeparators) { }
-
-        public static LineChunkerThatPreservesNewlines Instance { get; } = new LineChunkerThatPreservesNewlines();
-    }
 }
 public class GameObjectMerger : IObjectMerger<UndertaleGameObject>
 {
