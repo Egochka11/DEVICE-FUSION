@@ -47,13 +47,13 @@ internal class Program
             var datapath = Console.ReadLine();
             Gaster.WriteLine("Where the file should be placed INCLUDING THE FILE NAME AND EXTENSION:", "THE DESTINATION OF FUSION.");
             var savepath = Console.ReadLine();
-            Gaster.WriteLine("Patch amount:", "THE AMOUNT OF ALTERATIONS.");
+            Gaster.WriteLine("Mod amount:", "THE AMOUNT OF ALTERATIONS.");
             var totalPatches = uint.Parse(Console.ReadLine());
 
             var patches = new List<string>();
             for (uint i = 0; i < totalPatches; i++)
             {
-                Gaster.WriteLine($"Patch {i + 1}:", $"DELTA {i + 1}.");
+                Gaster.WriteLine($"Mod {i + 1}:", $"DELTA {i + 1}.");
                 patches.Add(Console.ReadLine());
             }
             await DoMerging(datapath , savepath, patches);
@@ -66,14 +66,19 @@ internal class Program
     }
 
     public static async Task DoMerging(string datapath, string savepath, List<string> patches)
-    {   
+    {
+        datapath = datapath.Trim('/', '"');
+        savepath = savepath.Trim('/', '"');
+        for (int i = 0; i <= patches.Count; i++)
+            patches[i] = patches[i].Trim('/', '"');
+
         var totalPatches = patches.Count;
 
         Directory.CreateDirectory("cache\\patchedData");
 
         File.Copy(datapath, "cache\\patchedData\\0.win", true);
         Gaster.WriteLine("Patching mods into separate files...", "APPLYING THE DELTAS SEPARATELY.");
-        await XdeltaPatching.PatchXDelta(datapath, patches, programLocation + "\\cache\\patchedData");
+        await ModPatching.Patch(datapath, patches, programLocation + "\\cache\\patchedData");
 
         Gaster.WriteLine("Loading the data files into memory...", "DECONSTRUCTING THE DELTA STORIES.");
         List<UndertaleData> datas = [];
