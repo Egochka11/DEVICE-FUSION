@@ -60,8 +60,8 @@ internal class Program
         }
         catch (Exception ex)
         {
-            Gaster.WriteLine($"An error occurred. The error information was saved in {Path.GetFullPath("cache\\crashLog.txt")}", $"ERROR OCCURED. IT MAY BE REVIEWED IN {Path.GetFullPath("cache\\crashLog.txt")}.");
-            File.WriteAllText("cache\\crashLog.txt", ex.ToString());
+            Gaster.WriteLine($"An error occurred. The error information was saved in {programLocation + "\\cache\\crashLog.txt"}", $"ERROR OCCURED. IT MAY BE REVIEWED IN {programLocation + "\\cache\\crashLog.txt"}.");
+            File.WriteAllText(programLocation + "\\cache\\crashLog.txt", ex.ToString());
         }
     }
 
@@ -69,14 +69,14 @@ internal class Program
     {
         datapath = datapath.Trim('/', '"');
         savepath = savepath.Trim('/', '"');
-        for (int i = 0; i <= patches.Count; i++)
+        for (int i = 0; i < patches.Count; i++)
             patches[i] = patches[i].Trim('/', '"');
 
         var totalPatches = patches.Count;
 
-        Directory.CreateDirectory("cache\\patchedData");
+        Directory.CreateDirectory(programLocation + "\\cache\\patchedData");
 
-        File.Copy(datapath, "cache\\patchedData\\0.win", true);
+        File.Copy(datapath, programLocation + "\\cache\\patchedData\\0.win", true);
         Gaster.WriteLine("Patching mods into separate files...", "APPLYING THE DELTAS SEPARATELY.");
         await ModPatching.Patch(datapath, patches, programLocation + "\\cache\\patchedData");
 
@@ -84,7 +84,7 @@ internal class Program
         List<UndertaleData> datas = [];
         for (int i = 0; i <= totalPatches; i++)
         {
-            using FileStream fileStream = new($"cache\\patchedData\\{i}.win", FileMode.Open, FileAccess.Read);
+            using FileStream fileStream = new($"{programLocation}\\cache\\patchedData\\{i}.win", FileMode.Open, FileAccess.Read);
             datas.Add(UndertaleIO.Read(fileStream));
             datas[i].ToolInfo.DecompilerSettings = new DecompileSettings() //decompile settings for more consistent diffs
             {
@@ -110,7 +110,7 @@ internal class Program
         CodeMerger.Merge(datas);
 
         Gaster.WriteLine("Saving merged data.win...", "CREATING THE FILE OF FUSION.");
-        using (FileStream fileStream = new("cache\\patchedData\\data.win", FileMode.Create, FileAccess.Write))
+        using (FileStream fileStream = new(programLocation + "\\cache\\patchedData\\data.win", FileMode.Create, FileAccess.Write))
         {
             UndertaleIO.Write(fileStream, datas[0]);
         }
