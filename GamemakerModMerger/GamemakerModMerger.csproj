@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <PackageReference Include="DiffPlex" Version="1.9.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.14.0" />
   </ItemGroup>
 
   <ItemGroup>
