@@ -12,70 +12,70 @@ using UndertaleModLib;
 using UndertaleModLib.Compiler;
 using UndertaleModLib.Decompiler;
 using UndertaleModLib.Models;
-using static UndertaleModLib.Models.UndertaleRoom;
+using static GamemakerModMerger.Program;
 
 namespace GamemakerModMerger;
 public interface IObjectMerger<T> where T : UndertaleObject, new()
 {
-    static abstract UndertalePointerList<T> Merge(List<UndertaleData> datas);
+    static abstract UndertalePointerList<T> Merge();
 
 
 }
 
 public class SpriteMerger : IObjectMerger<UndertaleSprite>
 {
-    public static UndertalePointerList<UndertaleSprite> Merge(List<UndertaleData> datas)
+    public static UndertalePointerList<UndertaleSprite> Merge()
     {
-        //UndertalePointerList<UndertaleSprite> origSprites = [.. datas[0].Sprites]; // used to make sure the sprites are not overwritten by vanilla sprites from another mod's data file
-        bool[] spriteChanged = new bool[datas[0].Sprites.Count];
-        foreach (UndertaleData data in datas)
+        //UndertalePointerList<UndertaleSprite> origSprites = [.. Datas[0].Sprites]; // used to make sure the sprites are not overwritten by vanilla sprites from another mod's data file
+        bool[] spriteChanged = new bool[Datas[0].Sprites.Count];
+        foreach (UndertaleData data in Datas)
         {
-            if (datas.IndexOf(data) == 0) continue; // skip vanilla
+            if (Datas.IndexOf(data) == 0) continue; // skip vanilla
             foreach (UndertaleSprite sprite in data.Sprites)
             {
-                var origSprite = datas[0].Sprites.ByName(sprite.Name.Content);
+                var origSprite = Datas[0].Sprites.ByName(sprite.Name.Content);
                 if (origSprite == null)
                 {
-                    datas[0].AddSprite(sprite);
+                    Datas[0].AddSprite(sprite);
                     spriteChanged = [.. spriteChanged, true];
                 }
-                else if (!spriteChanged[datas[0].IndexOf(origSprite)] && !origSprite.Match(sprite)) 
+                else if (!spriteChanged[Datas[0].IndexOf(origSprite)] && !origSprite.Match(sprite)) 
                 { 
-                    datas[0].ReplaceSprite(sprite);
-                    spriteChanged[datas[0].IndexOf(origSprite)] = true;
+                    Datas[0].ReplaceSprite(sprite);
+                    spriteChanged[Datas[0].IndexOf(origSprite)] = true;
                 }
                 if (data.Sprites.IndexOf(sprite) % 100 == 0)
-                    Gaster.WriteLine($"{data.Sprites.IndexOf(sprite)}/{data.Sprites.Count} Sprites of mod {datas.IndexOf(data)} iterated.", 
-                        $"{data.Sprites.IndexOf(sprite)}/{data.Sprites.Count} IMAGES HANDLED IN DELTA {datas.IndexOf(data)}.");
+                    Gaster.WriteLine($"{data.Sprites.IndexOf(sprite)}/{data.Sprites.Count} Sprites of mod {Datas.IndexOf(data)} iterated.", 
+                        $"{data.Sprites.IndexOf(sprite)}/{data.Sprites.Count} IMAGES HANDLED IN DELTA {Datas.IndexOf(data)}.");
             }
-            Gaster.WriteLine($"Sprite merging complete for mod {datas.IndexOf(data)}.", $"ALL IMAGES HANDLED IN DELTA {datas.IndexOf(data)}.");
+            Gaster.WriteLine($"Sprite merging complete for mod {Datas.IndexOf(data)}.", $"ALL IMAGES HANDLED IN DELTA {Datas.IndexOf(data)}.");
         }
-        return datas[0].Sprites as UndertalePointerList<UndertaleSprite>;
+        return Datas[0].Sprites as UndertalePointerList<UndertaleSprite>;
     }
 }
 
 public class CodeMerger : IObjectMerger<UndertaleCode>
 {
-    public static UndertalePointerList<UndertaleCode> Merge(List<UndertaleData> datas)
+    public static UndertalePointerList<UndertaleCode> Merge()
     {
-        GlobalDecompileContext[] context = new GlobalDecompileContext[datas.Count];
+        GlobalDecompileContext[] context = new GlobalDecompileContext[Datas.Count];
 
         List<string> changedCode = [];
-        for (var i = 0; i < datas.Count; i++)
+        for (var i = 0; i < Datas.Count; i++)
         {
-            var data = datas[i];
+            var data = Datas[i];
             context[i] = new(data);
-            if (datas.IndexOf(data) == 0) continue; // skip vanilla
+            if (Datas.IndexOf(data) == 0) continue; // skip vanilla
             foreach (UndertaleCode code in data.Code)
             {
                 if (code.ParentEntry != null) continue;
                 bool check;
-                if (datas[0].Code.ByName(code.Name.Content) == null)
+                if (Datas[0].Code.ByName(code.Name.Content) == null)
                     check = true;
                 else
                 {
                     var newCode = new DecompileContext(context[i], code, data.ToolInfo.DecompilerSettings).DecompileToString();
-                    var origCode = new DecompileContext(context[0], datas[0].Code.ByName(code.Name.Content), datas[0].ToolInfo.DecompilerSettings).DecompileToString();
+                    var origCode = new DecompileContext(context[0], Datas[0].Code.ByName(code.Name.Content), Datas[0].ToolInfo.DecompilerSettings).DecompileToString();
                     check = newCode != origCode;
                 }
 
@@ -83,7 +83,7 @@ public class CodeMerger : IObjectMerger<UndertaleCode>
                     changedCode.Add(code.Name.Content);
 
 
-                if (datas[0].Code.ByName(code.Name.Content) == null && code.Name.Content.Contains("_Collision_"))
+                if (Datas[0].Code.ByName(code.Name.Content) == null && code.Name.Content.Contains("_Collision_"))
                 {
                     string codeEntryName = code.Name.Content;
                     int lastUnderscore = codeEntryName.LastIndexOf('_');
@@ -91,32 +91,32 @@ public class CodeMerger : IObjectMerger<UndertaleCode>
 
                     ReadOnlySpan<char> objectName = codeEntryName.AsSpan(new Range("gml_Object_".Length, secondLastUnderscore));
 
-                    UndertaleCode newCode = new() { Name = datas[0].Strings.MakeString(codeEntryName) };
-                    datas[0].Code.Add(newCode);
+                    UndertaleCode newCode = new() { Name = Datas[0].Strings.MakeString(codeEntryName) };
+                    Datas[0].Code.Add(newCode);
 
-                    CodeImportGroup.LinkEvent(datas[0].GameObjects.ByName(objectName), newCode, EventType.Collision, (uint)datas[0].GameObjects.IndexOfName(data.GameObjects[int.Parse(codeEntryName.AsSpan(lastUnderscore + 1))].Name.Content));
+                    CodeImportGroup.LinkEvent(Datas[0].GameObjects.ByName(objectName), newCode, EventType.Collision, (uint)Datas[0].GameObjects.IndexOfName(data.GameObjects[int.Parse(codeEntryName.AsSpan(lastUnderscore + 1))].Name.Content));
                 }
 
                 if (data.Code.IndexOf(code) % 100 == 0)
-                    Gaster.WriteLine($"{data.Code.IndexOf(code)}/{data.Code.Count} Code entries of mod {datas.IndexOf(data)} iterated.",
-                        $"{data.Code.IndexOf(code)}/{data.Code.Count} CODE ENTRIES ITERATED IN DELTA {datas.IndexOf(data)}.");
+                    Gaster.WriteLine($"{data.Code.IndexOf(code)}/{data.Code.Count} Code entries of mod {Datas.IndexOf(data)} iterated.",
+                        $"{data.Code.IndexOf(code)}/{data.Code.Count} CODE ENTRIES ITERATED IN DELTA {Datas.IndexOf(data)}.");
             }
-            Gaster.WriteLine($"All code entries iterated for mod {datas.IndexOf(data)}.", $"ALL CODE ENTRIES ITERATED IN DELTA {datas.IndexOf(data)}.");
+            Gaster.WriteLine($"All code entries iterated for mod {Datas.IndexOf(data)}.", $"ALL CODE ENTRIES ITERATED IN DELTA {Datas.IndexOf(data)}.");
         }
 
         Gaster.WriteLine("Beginning code merging...", "BEGINNING FUSION OF CODE TEXT.");
 
-        CodeImportGroup importGroup = new(datas[0]);
         foreach (string codeName in changedCode)
         {
-            var origCodeObj = datas[0].Code.ByName(codeName);
-            string origCode = origCodeObj == null ? "\n" : new DecompileContext(context[0], origCodeObj, datas[0].ToolInfo.DecompilerSettings).DecompileToString();
+            CodeImportGroup importGroup = new(Datas[0]);
+            var origCodeObj = Datas[0].Code.ByName(codeName);
+            string origCode = origCodeObj == null ? "\n" : new DecompileContext(context[0], origCodeObj, Datas[0].ToolInfo.DecompilerSettings).DecompileToString();
             string mergedCode = origCode;
 
-            for (int data = 1; data < datas.Count; data++)
+            for (int data = 1; data < Datas.Count; data++)
             {
-                var thisCodeObj = datas[data].Code.ByName(codeName);
-                string thisCode = thisCodeObj == null ? "\n" : new DecompileContext(context[data], thisCodeObj, datas[data].ToolInfo.DecompilerSettings).DecompileToString();
+                var thisCodeObj = Datas[data].Code.ByName(codeName);
+                string thisCode = thisCodeObj == null ? "\n" : new DecompileContext(context[data], thisCodeObj, Datas[data].ToolInfo.DecompilerSettings).DecompileToString();
                 var diff = ThreeWayDiffer.Instance.CreateDiffs(origCode, mergedCode, thisCode, true, false, LineEndingsPreservingChunker.Instance);
 
                 mergedCode = "";
@@ -176,38 +176,46 @@ public class CodeMerger : IObjectMerger<UndertaleCode>
                 }
             }
             importGroup.QueueReplace(codeName, mergedCode);
+            try
+            {
+                importGroup.Import();
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"An error occurred while importing merged code for \"{codeName}\": {e.Message}", e);
+                //Gaster.WriteLine($"An error occurred while importing merged code for \"{codeName}\": {e.Message}", 
+                //    $"ERROR DURING IMPORT OF FUSED CODE FOR \"{codeName}\": {e.Message}");
+            }
         }
 
-        Gaster.WriteLine("Beginning Code import...", "BEGINNING CODE IMPORT.");
-        importGroup.Import();
-        return datas[0].Code as UndertalePointerList<UndertaleCode>;
+        return Datas[0].Code as UndertalePointerList<UndertaleCode>;
     }
 }
 public class GameObjectMerger : IObjectMerger<UndertaleGameObject>
 {
-    public static UndertalePointerList<UndertaleGameObject> Merge(List<UndertaleData> datas)
+    public static UndertalePointerList<UndertaleGameObject> Merge()
     {
-        foreach (UndertaleData data in datas)
+        foreach (UndertaleData data in Datas)
         {
-            if (datas.IndexOf(data) == 0) continue; // skip vanilla
+            if (Datas.IndexOf(data) == 0) continue; // skip vanilla
             foreach (UndertaleGameObject gameObject in data.GameObjects)
             {
-                var origObject = datas[0].GameObjects.ByName(gameObject.Name.Content);
+                var origObject = Datas[0].GameObjects.ByName(gameObject.Name.Content);
                 if (origObject == null)
                 {
                     origObject = new UndertaleGameObject();
-                    datas[0].GameObjects.Add(origObject);
-                    origObject.Name = datas[0].Strings.MakeString(gameObject.Name.Content);
+                    Datas[0].GameObjects.Add(origObject);
+                    origObject.Name = Datas[0].Strings.MakeString(gameObject.Name.Content);
                 }
                 if (gameObject.Sprite is not null)
-                    origObject.Sprite = datas[0].Sprites.ByName(gameObject.Sprite.Name.Content);
+                    origObject.Sprite = Datas[0].Sprites.ByName(gameObject.Sprite.Name.Content);
                 origObject.Visible = gameObject.Visible;
                 origObject.Managed = gameObject.Managed;
                 origObject.Solid = gameObject.Solid;
                 origObject.Depth = gameObject.Depth;
                 origObject.Persistent = gameObject.Persistent;
                 if (gameObject.TextureMaskId is not null)
-                    origObject.TextureMaskId = datas[0].Sprites.ByName(gameObject.TextureMaskId.Name.Content);
+                    origObject.TextureMaskId = Datas[0].Sprites.ByName(gameObject.TextureMaskId.Name.Content);
 
                 // Physics.
                 origObject.UsesPhysics = gameObject.UsesPhysics;
@@ -225,22 +233,22 @@ public class GameObjectMerger : IObjectMerger<UndertaleGameObject>
                 //Events should be handled by the code merger
 
                 if (data.GameObjects.IndexOf(gameObject) % 100 == 0)
-                    Gaster.WriteLine($"{data.GameObjects.IndexOf(gameObject)}/{data.GameObjects.Count} Objects of mod {datas.IndexOf(data)} iterated.",
-                        $"{data.GameObjects.IndexOf(gameObject)}/{data.GameObjects.Count} DEVICES HANDLED IN DELTA {datas.IndexOf(data)}.");
+                    Gaster.WriteLine($"{data.GameObjects.IndexOf(gameObject)}/{data.GameObjects.Count} Objects of mod {Datas.IndexOf(data)} iterated.",
+                        $"{data.GameObjects.IndexOf(gameObject)}/{data.GameObjects.Count} DEVICES HANDLED IN DELTA {Datas.IndexOf(data)}.");
             }
-            Gaster.WriteLine($"Object merging complete for mod {datas.IndexOf(data)}.", $"ALL DEVICES HANDLED IN DELTA {datas.IndexOf(data)}.");
+            Gaster.WriteLine($"Object merging complete for mod {Datas.IndexOf(data)}.", $"ALL DEVICES HANDLED IN DELTA {Datas.IndexOf(data)}.");
         }
-        foreach (UndertaleData data in datas)
+        foreach (UndertaleData data in Datas)
         {
-            if (datas.IndexOf(data) == 0) continue; // skip vanilla
+            if (Datas.IndexOf(data) == 0) continue; // skip vanilla
             foreach (UndertaleGameObject gameObject in data.GameObjects)
             {
-                var origObject = datas[0].GameObjects.ByName(gameObject.Name.Content);
+                var origObject = Datas[0].GameObjects.ByName(gameObject.Name.Content);
                 if (gameObject.ParentId is not null)
-                    origObject.ParentId = datas[0].GameObjects.ByName(gameObject.ParentId.Name.Content);
+                    origObject.ParentId = Datas[0].GameObjects.ByName(gameObject.ParentId.Name.Content);
             }
         }
-        return datas[0].GameObjects as UndertalePointerList<UndertaleGameObject>;
+        return Datas[0].GameObjects as UndertalePointerList<UndertaleGameObject>;
     }
 
 
@@ -248,28 +256,28 @@ public class GameObjectMerger : IObjectMerger<UndertaleGameObject>
 
 public class ShaderMerger : IObjectMerger<UndertaleShader>
 {
-    public static UndertalePointerList<UndertaleShader> Merge(List<UndertaleData> datas)
+    public static UndertalePointerList<UndertaleShader> Merge()
     {
-        foreach (UndertaleData data in datas)
+        foreach (UndertaleData data in Datas)
         {
-            if (datas.IndexOf(data) == 0) continue; // skip vanilla
+            if (Datas.IndexOf(data) == 0) continue; // skip vanilla
             foreach (var donorShader in data.Shaders)
             {
-                var targetShader = datas[0].Shaders.ByName(donorShader.Name.Content);
+                var targetShader = Datas[0].Shaders.ByName(donorShader.Name.Content);
                 if (targetShader == null)
                 {
                     targetShader = new UndertaleShader();
-                    datas[0].Shaders.Add(targetShader);
-                    targetShader.Name = datas[0].Strings.MakeString(donorShader.Name.Content);
+                    Datas[0].Shaders.Add(targetShader);
+                    targetShader.Name = Datas[0].Strings.MakeString(donorShader.Name.Content);
                 }
                 targetShader.Type = donorShader.Type;
 
-                targetShader.GLSL_ES_Vertex = datas[0].Strings.MakeString(donorShader.GLSL_ES_Vertex.Content);
-                targetShader.GLSL_ES_Fragment = datas[0].Strings.MakeString(donorShader.GLSL_ES_Fragment.Content);
-                targetShader.GLSL_Vertex = datas[0].Strings.MakeString(donorShader.GLSL_Vertex.Content);
-                targetShader.GLSL_Fragment = datas[0].Strings.MakeString(donorShader.GLSL_Fragment.Content);
-                targetShader.HLSL9_Vertex = datas[0].Strings.MakeString(donorShader.HLSL9_Vertex.Content);
-                targetShader.HLSL9_Fragment = datas[0].Strings.MakeString(donorShader.HLSL9_Fragment.Content);
+                targetShader.GLSL_ES_Vertex = Datas[0].Strings.MakeString(donorShader.GLSL_ES_Vertex.Content);
+                targetShader.GLSL_ES_Fragment = Datas[0].Strings.MakeString(donorShader.GLSL_ES_Fragment.Content);
+                targetShader.GLSL_Vertex = Datas[0].Strings.MakeString(donorShader.GLSL_Vertex.Content);
+                targetShader.GLSL_Fragment = Datas[0].Strings.MakeString(donorShader.GLSL_Fragment.Content);
+                targetShader.HLSL9_Vertex = Datas[0].Strings.MakeString(donorShader.HLSL9_Vertex.Content);
+                targetShader.HLSL9_Fragment = Datas[0].Strings.MakeString(donorShader.HLSL9_Fragment.Content);
 
                 targetShader.Version = donorShader.Version;
 
@@ -285,20 +293,39 @@ public class ShaderMerger : IObjectMerger<UndertaleShader>
                 */
                 foreach (var attribute in donorShader.VertexShaderAttributes)
                 {
-                    targetShader.VertexShaderAttributes.Add(new UndertaleShader.VertexShaderAttribute() { Name = datas[0].Strings.MakeString(donorShader.Name.Content)});
+                    targetShader.VertexShaderAttributes.Add(new UndertaleShader.VertexShaderAttribute() { Name = Datas[0].Strings.MakeString(donorShader.Name.Content)});
                 }
 
                 //VertexShaderAttribute and yeah
 
                 if (data.Shaders.IndexOf(donorShader) % 100 == 0)
-                    Gaster.WriteLine($"{data.Shaders.IndexOf(donorShader)}/{data.Shaders.Count} Shaders of mod {datas.IndexOf(data)} iterated.", 
-                        $"{data.Shaders.IndexOf(donorShader)}/{data.Shaders.Count} SHADERS HANDLED IN DELTA {datas.IndexOf(data)}.");
+                    Gaster.WriteLine($"{data.Shaders.IndexOf(donorShader)}/{data.Shaders.Count} Shaders of mod {Datas.IndexOf(data)} iterated.", 
+                        $"{data.Shaders.IndexOf(donorShader)}/{data.Shaders.Count} SHADERS HANDLED IN DELTA {Datas.IndexOf(data)}.");
             }
-            Gaster.WriteLine($"Shader merging complete for mod {datas.IndexOf(data)}.", $"ALL SHADERS HANDLED IN DELTA {datas.IndexOf(data)}.");
+            Gaster.WriteLine($"Shader merging complete for mod {Datas.IndexOf(data)}.", $"ALL SHADERS HANDLED IN DELTA {Datas.IndexOf(data)}.");
         }
-        return datas[0].Shaders as UndertalePointerList<UndertaleShader>;
+        return Datas[0].Shaders as UndertalePointerList<UndertaleShader>;
     }
 
 
 }
 
+public class UndertaleGeneralInfoMerger
+{
+    public void Merge()
+    {
+        foreach (var data in Datas)
+        {
+            if (Datas.IndexOf(data) == 0) return;
+
+            var origInfo = Datas[0].GeneralInfo;
+            var info = data.GeneralInfo;
+
+            if (origInfo.Info != info.Info)
+            {
+
+            }
+                
+        }
+    }
+}

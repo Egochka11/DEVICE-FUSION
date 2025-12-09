@@ -12,10 +12,13 @@ public static class Gaster
     public static void WriteLine(string message)
     {
         Console.WriteLine(message);
+        Program.FileStream.Write(Encoding.UTF8.GetBytes(message + Environment.NewLine));
     }
     public static void WriteLine(string message, string altMessage)
     {
         Console.WriteLine(GasterAlt ? altMessage : message);
+        Program.FileStream.Write(Encoding.UTF8.GetBytes(message + Environment.NewLine)); // gaster is too cryptic to be logged
+        // 🐘 ADDRESS ME.
     }
 
 }
